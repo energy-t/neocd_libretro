@@ -1,5 +1,7 @@
 #ifndef NEOGEOCD_H
 #define NEOGEOCD_H
+#define TEST_FRAME_BOUNDARY
+#define ADJUST_FRAME_BOUNDARY
 
 #include <cstddef>
 
@@ -55,12 +57,20 @@ public:
 
     inline int  getScreenX() const
     {
+#ifndef ADJUST_FRAME_BOUNDARY
         return (Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame) % Timer::SCREEN_WIDTH);
+#else
+        return (Timer::VBL_IRQ_X + Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame)) % Timer::SCREEN_WIDTH;
+#endif
     }
 
     inline int  getScreenY() const
     {
+#ifndef ADJUST_FRAME_BOUNDARY
         return (Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame) / Timer::SCREEN_WIDTH);
+#else
+        return (Timer::VBL_IRQ_Y + (Timer::VBL_IRQ_X + Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame)) / Timer::SCREEN_WIDTH) % Timer::SCREEN_HEIGHT;
+#endif
     }
 
     inline bool isCdDecoderIRQEnabled() const
@@ -125,6 +135,9 @@ public:
     uint32_t    audioCommand;
     uint32_t    audioResult;
     uint32_t    biosType;
+#ifdef TEST_FRAME_BOUNDARY
+    uint32_t    currentFrame;
+#endif
     // End variables to save in savestate
 };
 

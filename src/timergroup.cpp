@@ -42,6 +42,9 @@ void vblIrqTimerCallback(Timer* timer, uint32_t userData)
         neocd->video.autoAnimationFrameCounter--;
 
     timer->armRelative(Timer::pixelToMaster(Timer::SCREEN_WIDTH * Timer::SCREEN_HEIGHT));
+#ifdef TEST_FRAME_BOUNDARY
+    neocd->video.currentVideoFrame++;
+#endif
 }
 
 void hirqTimerCallback(Timer* timer, uint32_t userData)
@@ -212,13 +215,35 @@ void TimerGroup::reset()
 {
     timer<TimerGroup::Watchdog>().setState(Timer::Stopped);
 
+#ifndef ADJUST_FRAME_BOUNDARY
     timer<TimerGroup::Drawline>().arm(Timer::pixelToMaster(Timer::ACTIVE_AREA_LEFT));
+#else
+    timer<TimerGroup::Drawline>().arm(Timer::pixelToMaster(Timer::ACTIVE_AREA_LEFT - Timer::VBL_IRQ_X));
+#endif
 
+#ifndef ADJUST_FRAME_BOUNDARY
     timer<TimerGroup::Vbl>().arm(Timer::pixelToMaster((Timer::VBL_IRQ_Y * Timer::SCREEN_WIDTH) + Timer::VBL_IRQ_X));
+#else
+    timer<TimerGroup::Vbl>().arm(Timer::pixelToMaster(Timer::SCREEN_WIDTH * Timer::SCREEN_HEIGHT));
+#endif
 
     timer<TimerGroup::Hbl>().setState(Timer::Stopped);
 
+#ifndef ADJUST_FRAME_BOUNDARY
     timer<TimerGroup::VblReload>().arm(Timer::pixelToMaster((Timer::VBL_RELOAD_Y * Timer::SCREEN_WIDTH) + Timer::VBL_RELOAD_X));
+#else
+    timer<TimerGroup::VblReload>().arm(Timer::pixelToMaster((Timer::VBL_RELOAD_Y - Timer::VBL_IRQ_Y) * Timer::SCREEN_WIDTH + (Timer::VBL_RELOAD_X - Timer::VBL_IRQ_X)));
+    assert(
+        Timer::pixelToMaster(
+            ((Timer::VBL_RELOAD_Y * Timer::SCREEN_WIDTH) + Timer::VBL_RELOAD_X)
+            -
+            ((Timer::VBL_IRQ_Y * Timer::SCREEN_WIDTH) + Timer::VBL_IRQ_X)
+        ) ==
+        Timer::pixelToMaster(
+            (Timer::VBL_RELOAD_Y - Timer::VBL_IRQ_Y) * Timer::SCREEN_WIDTH + (Timer::VBL_RELOAD_X - Timer::VBL_IRQ_X)
+        )
+    );
+#endif
 
     timer<TimerGroup::Cdrom>().arm(Timer::CDROM_64HZ_DELAY);
 

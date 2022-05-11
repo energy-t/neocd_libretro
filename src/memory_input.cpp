@@ -1,6 +1,9 @@
 #include "libretro_common.h"
 #include "memory_input.h"
 #include "neogeocd.h"
+#ifdef TEST_FRAME_BOUNDARY
+#include "libretro_log.h"
+#endif
 
 static uint32_t controller1ReadByte(uint32_t address)
 {
@@ -11,6 +14,16 @@ static uint32_t controller1ReadByte(uint32_t address)
         case 0x00:
         case 0x12:
         case 0x1B:
+#ifdef TEST_FRAME_BOUNDARY
+            Libretro::Log::message(RETRO_LOG_INFO,
+                "CRB: %u frame, %u vframe, %u rem cycles, %u sel, %i y, %i x\n",
+                neocd->currentFrame,
+                neocd->video.currentVideoFrame,
+                neocd->remainingCyclesThisFrame,
+                neocd->input.selector,
+                neocd->getScreenY(),
+                neocd->getScreenX());
+#endif
             return neocd->input.input1;
         }
     }
@@ -25,6 +38,16 @@ static uint32_t controller1ReadWord(uint32_t address)
     case 0x00:
     case 0x12:
     case 0x1B:
+#ifdef TEST_FRAME_BOUNDARY
+        Libretro::Log::message(RETRO_LOG_INFO,
+            "CRW: %u frame, %u vframe %u, rem cycles, %u sel, %i y, %i x\n",
+            neocd->currentFrame,
+            neocd->video.currentVideoFrame,
+            neocd->remainingCyclesThisFrame,
+            neocd->input.selector,
+            neocd->getScreenY(),
+            neocd->getScreenX());
+#endif
         return ((neocd->input.input1 << 8) | 0xFF);
     }
 

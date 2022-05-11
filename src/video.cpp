@@ -115,6 +115,9 @@ Video::Video() :
     sprite_y(0),
     sprite_zoomX(15),
     sprite_zoomY(255),
+#ifdef TEST_FRAME_BOUNDARY
+    currentVideoFrame(0),
+#endif
     sprite_clipping(0x20)
 {
     static_assert((FRAMEBUFFER_WIDTH % 16) == 0, "Framebuffer width must be a multiple of 16.");
@@ -164,6 +167,9 @@ void Video::reset()
     sprite_zoomX = 15;
     sprite_zoomY = 255;
     sprite_clipping = 0x20;
+#ifdef TEST_FRAME_BOUNDARY
+    currentVideoFrame = 0;
+#endif
 }
 
 void Video::convertColor(uint32_t index)
@@ -659,6 +665,9 @@ DataPacker& operator<<(DataPacker& out, const Video& video)
     out << video.sprite_zoomX;
     out << video.sprite_zoomY;
     out << video.sprite_clipping;
+#ifdef TEST_FRAME_BOUNDARY
+    out << video.currentVideoFrame;
+#endif
 
     return out;
 }
@@ -683,6 +692,9 @@ DataPacker& operator>>(DataPacker& in, Video& video)
     in >> video.sprite_zoomX;
     in >> video.sprite_zoomY;
     in >> video.sprite_clipping;
+#ifdef TEST_FRAME_BOUNDARY
+    in >> video.currentVideoFrame;
+#endif
 
     return in;
 }

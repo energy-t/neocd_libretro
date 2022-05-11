@@ -38,6 +38,9 @@ NeoGeoCD::NeoGeoCD() :
     currentTimeSeconds(0.0),
     audioCommand(0),
     audioResult(0),
+#ifdef TEST_FRAME_BOUNDARY
+    currentFrame(0),
+#endif
     biosType(Bios::Unknown)
 {
     // Create the worker thread to buffer & decode audio data
@@ -94,6 +97,9 @@ void NeoGeoCD::reset()
     fastForward = false;
     audioCommand = 0;
     audioResult = 0;
+#ifdef TEST_FRAME_BOUNDARY
+    currentFrame = 0;
+#endif
 
     m68k_pulse_reset();
     z80_reset();
@@ -146,6 +152,9 @@ void NeoGeoCD::runOneFrame()
     PROFILE(p_audioYM2610, ProfilingCategory::AudioYM2610);
     audio.finalize();
     PROFILE_END(p_audioYM2610);
+#ifdef TEST_FRAME_BOUNDARY
+    currentFrame++;
+#endif
 }
 
 void NeoGeoCD::setInterrupt(NeoGeoCD::Interrupt interrupt)
@@ -248,6 +257,9 @@ bool NeoGeoCD::saveState(DataPacker& out) const
     out << audioCommand;
     out << audioResult;
     out << biosType;
+#ifdef TEST_FRAME_BOUNDARY
+    out << currentFrame;
+#endif
 
     // M68K
     out << m68ki_cpu;
@@ -299,6 +311,9 @@ bool NeoGeoCD::restoreState(DataPacker& in)
     in >> audioCommand;
     in >> audioResult;
     in >> biosType;
+#ifdef TEST_FRAME_BOUNDARY
+    in >> currentFrame;
+#endif
 
     // M68K
     in >> m68ki_cpu;

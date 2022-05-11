@@ -83,6 +83,9 @@ public:
     uint32_t sprite_zoomX;
     uint32_t sprite_zoomY;
     uint32_t sprite_clipping;
+#ifdef TEST_FRAME_BOUNDARY
+    uint32_t currentVideoFrame;
+#endif
     // End variables to save in savestate
 };
 
