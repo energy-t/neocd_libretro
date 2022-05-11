@@ -212,13 +212,13 @@ void TimerGroup::reset()
 {
     timer<TimerGroup::Watchdog>().setState(Timer::Stopped);
 
-    timer<TimerGroup::Drawline>().arm(Timer::pixelToMaster(Timer::ACTIVE_AREA_LEFT));
+    timer<TimerGroup::Drawline>().arm(Timer::pixelToMaster(Timer::ACTIVE_AREA_LEFT - Timer::VBL_IRQ_X));
 
-    timer<TimerGroup::Vbl>().arm(Timer::pixelToMaster((Timer::VBL_IRQ_Y * Timer::SCREEN_WIDTH) + Timer::VBL_IRQ_X));
+    timer<TimerGroup::Vbl>().arm(Timer::pixelToMaster(Timer::SCREEN_WIDTH * Timer::SCREEN_HEIGHT));
 
     timer<TimerGroup::Hbl>().setState(Timer::Stopped);
 
-    timer<TimerGroup::VblReload>().arm(Timer::pixelToMaster((Timer::VBL_RELOAD_Y * Timer::SCREEN_WIDTH) + Timer::VBL_RELOAD_X));
+    timer<TimerGroup::VblReload>().arm(Timer::pixelToMaster((Timer::VBL_RELOAD_Y - Timer::VBL_IRQ_Y) * Timer::SCREEN_WIDTH + (Timer::VBL_RELOAD_X - Timer::VBL_IRQ_X)));
 
     timer<TimerGroup::Cdrom>().arm(Timer::CDROM_64HZ_DELAY);
 

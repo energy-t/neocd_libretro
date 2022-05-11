@@ -55,12 +55,12 @@ public:
 
     inline int  getScreenX() const
     {
-        return (Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame) % Timer::SCREEN_WIDTH);
+        return (Timer::VBL_IRQ_X + Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame)) % Timer::SCREEN_WIDTH;
     }
 
     inline int  getScreenY() const
     {
-        return (Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame) / Timer::SCREEN_WIDTH);
+        return (Timer::VBL_IRQ_Y + (Timer::VBL_IRQ_X + Timer::masterToPixel(Timer::CYCLES_PER_FRAME - remainingCyclesThisFrame)) / Timer::SCREEN_WIDTH) % Timer::SCREEN_HEIGHT;
     }
 
     inline bool isCdDecoderIRQEnabled() const
