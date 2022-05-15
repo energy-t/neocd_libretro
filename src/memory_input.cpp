@@ -23,6 +23,12 @@ static uint32_t controller1ReadByte(uint32_t address)
                 neocd->input.selector,
                 neocd->getScreenY(),
                 neocd->getScreenX());
+#ifdef ADJUST_FRAME_BOUNDARY
+	    assert(neocd->video.currentVideoFrame - neocd->currentFrame == 0);
+#else
+	    assert(neocd->video.currentVideoFrame - neocd->currentFrame == 0 ||
+                   neocd->video.currentVideoFrame - neocd->currentFrame == 1);
+#endif
 #endif
             return neocd->input.input1;
         }
